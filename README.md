@@ -1,4 +1,4 @@
-# Papa John's Interview - Amiibo Shopping App
+# Interview - Amiibo Shopping App
 
 A React Native mobile application showcasing a shopping experience for Zelda-themed amiibo products. This project was created for a technical interview and has been modernized with professional code quality, comprehensive testing, and best practices.
 
