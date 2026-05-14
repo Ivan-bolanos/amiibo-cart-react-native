@@ -1,21 +1,25 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function Product({ item, onPress, navigation }) {
     const onPressTouchable = (action) => {
-        if (item.quantity == null) {
-            item.quantity = 1;
-        } else if (action === 'ADD') {
-            item.quantity++;
+        const currentQuantity = item.quantity ?? 0;
+        let newQuantity;
+
+        if (action === 'ADD') {
+            newQuantity = currentQuantity + 1;
         } else if (action === 'SUBSTRACT') {
-            item.quantity--;
+            newQuantity = Math.max(0, currentQuantity - 1);
+        } else {
+            newQuantity = currentQuantity || 1;
         }
-        onPress(item);
+
+        const updatedItem = { ...item, quantity: newQuantity };
+        onPress(updatedItem);
     };
-    let disable = true;
-    if (item.quantity > 0) {
-        disable = false;
-    }
+
+    const disable = !(item.quantity > 0);
 
     return (
         <View style={styles.container}>
@@ -121,4 +125,19 @@ const styles = StyleSheet.create({
         fontSize: 14,
     },
 });
+
+Product.propTypes = {
+    item: PropTypes.shape({
+        key: PropTypes.number.isRequired,
+        name: PropTypes.string.isRequired,
+        image: PropTypes.string.isRequired,
+        price: PropTypes.number.isRequired,
+        quantity: PropTypes.number.isRequired,
+        character: PropTypes.string,
+        amiiboSeries: PropTypes.string,
+        gameSeries: PropTypes.string,
+    }).isRequired,
+    onPress: PropTypes.func.isRequired,
+    navigation: PropTypes.object.isRequired,
+};
 

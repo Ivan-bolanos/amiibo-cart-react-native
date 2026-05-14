@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import customStyle from '../commons/CustomStyle';
 import { editItem } from '../redux/actions';
@@ -7,24 +8,28 @@ import { useDispatch } from 'react-redux';
 const GameDetail = ({ navigation, route }) => {
 
     const { params } = route;
-    let item = params?.item;
-    let disable = true;
-    if (item.quantity > 0) {
-        disable = false;
-    }
-    const [quantity, setQuantity] = useState(item.quantity);
+    const item = params?.item;
+    const [quantity, setQuantity] = useState(item.quantity ?? 0);
     const dispatch = useDispatch();
+
     const onPressTouchable = (action) => {
-        if (item.quantity == null) {
-            item.quantity = 1;
-        } else if (action === 'ADD') {
-            item.quantity++;
+        const currentQuantity = quantity;
+        let newQuantity;
+
+        if (action === 'ADD') {
+            newQuantity = currentQuantity + 1;
         } else if (action === 'SUBSTRACT') {
-            item.quantity--;
+            newQuantity = Math.max(0, currentQuantity - 1);
+        } else {
+            newQuantity = currentQuantity || 1;
         }
-        setQuantity(item.quantity)
-        dispatch(editItem(item));
+
+        setQuantity(newQuantity);
+        const updatedItem = { ...item, quantity: newQuantity };
+        dispatch(editItem(updatedItem));
     };
+
+    const disable = !(quantity > 0);
 
     return (
         <View style={{ flex: 1 }}>
@@ -145,5 +150,22 @@ const styles = StyleSheet.create({
     },
 });
 
+GameDetail.propTypes = {
+    navigation: PropTypes.object.isRequired,
+    route: PropTypes.shape({
+        params: PropTypes.shape({
+            item: PropTypes.shape({
+                key: PropTypes.number.isRequired,
+                name: PropTypes.string.isRequired,
+                image: PropTypes.string.isRequired,
+                price: PropTypes.number.isRequired,
+                quantity: PropTypes.number.isRequired,
+                character: PropTypes.string,
+                amiiboSeries: PropTypes.string,
+                gameSeries: PropTypes.string,
+            }).isRequired,
+        }).isRequired,
+    }).isRequired,
+};
 
 export default GameDetail;
